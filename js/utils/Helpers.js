@@ -18,7 +18,9 @@ export class ParallaxBackground {
         Math.random() < 0.6 ? 'deco_cloud' : 'deco_star',
       );
       deco.setAlpha(0.7).setScale(Phaser.Math.FloatBetween(0.5, 1.1)).setDepth(-5);
+      deco.setScrollFactor(0);
       deco.parallax = Phaser.Math.FloatBetween(0.2, 0.5);
+      deco.baseY = deco.y;
       this.decor.add(deco);
     }
     this.weatherEmitter = null;
@@ -52,10 +54,13 @@ export class ParallaxBackground {
   /** cameraY = current scroll (negative as camera rises); heightScore = climbed height */
   update(cameraY, heightScore) {
     this.sky.tilePositionY = cameraY * 0.15;
-    this.sky.y = GAME_HEIGHT / 2 + cameraY;
+    this.sky.y = GAME_HEIGHT / 2;
 
     this.decor.getChildren().forEach(d => {
-      d.y = ((d.y - cameraY * d.parallax) % (GAME_HEIGHT * 2) + GAME_HEIGHT * 2) % (GAME_HEIGHT * 2) - GAME_HEIGHT / 2 + cameraY;
+      const span = GAME_HEIGHT * 2;
+      const wrapped = ((d.baseY - cameraY * d.parallax) % span + span) % span;
+      d.y = wrapped - GAME_HEIGHT / 2;
+      // d.y = ((d.y - cameraY * d.parallax) % (GAME_HEIGHT * 2) + GAME_HEIGHT * 2) % (GAME_HEIGHT * 2) - GAME_HEIGHT / 2 + cameraY;
     });
 
     const w = worldForScore(heightScore);
